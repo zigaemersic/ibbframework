@@ -69,6 +69,7 @@ def get_images_to_adjust_from_corrected_but_not_anotated():
         student_name, folder, img = line.split(";")
 
 
+        img = img.strip()
         if (folder, img) not in to_correct:
             to_correct[(folder, img)] = []
         to_correct[(folder, img)].append((student_name, EXPLAIN_MSG_FROM_NOT_ANNOTATED, EXPLAIN_MSG_FROM_NOT_ANNOTATED))
@@ -162,8 +163,6 @@ def aggregate_and_store_masks(mask_adresses):
     def get_mean_mask_index(masks_adresses):
         indexes_to_use = {}
 
-        cheaters = {}
-
         for key in masks_adresses:
             contents = []
 
@@ -195,28 +194,8 @@ def aggregate_and_store_masks(mask_adresses):
             if len(contents):
                 indexes_to_use[key] = np.argmin(np.abs(np.array(contents) - np.mean(contents)))
 
-                # if any of the by_len lists is longer than 1, then we have a cheater
-                for k in by_len:
-                    if len(by_len[k]) > 1:
-                        for name in by_len[k]:
-
-                            if name not in cheaters:
-                                cheaters[name] = []
-                            cheaters[name].append((key, len(by_len[k]), by_len[k]))
-
             else:
                 indexes_to_use[key] = None
-
-        print("cheaters in mask correction without the image", cheaters)
-        # for key in cheaters['dp8949@student.uni-lj.si']:
-        #     addr1 = os.path.join(ANNOTATIONS_PATH, "dp8949@student.uni-lj.si", "masks", key[0][0].zfill(3),
-        #                                        f"{key[0][1].zfill(2)}.png")
-        #     addr2 = os.path.join(ANNOTATIONS_PATH, "bp58607@student.uni-lj.si", "masks", key[0][0].zfill(3),
-        #                          f"{key[0][1].zfill(2)}.png")
-        #     img1 = cv2.imread(addr1)
-        #     img2 = cv2.imread(addr2)
-        #     print(img1 == img2)
-
 
         return indexes_to_use
 
@@ -300,9 +279,6 @@ def aggregate_and_store_masks_and_images(masks_and_image_adresses):
     def get_mean_mask_index(masks_and_image_adresses):
         indexes_to_use = {}
 
-        cheaters = {}
-
-
         for key in masks_and_image_adresses:
             contents = []
 
@@ -329,18 +305,6 @@ def aggregate_and_store_masks_and_images(masks_and_image_adresses):
 
             # get the index of the mask with the mean number of pixels
             indexes_to_use[key] = np.argmin(np.abs(np.array(contents) - np.mean(contents)))
-
-            # if any of the by_len lists is longer than 1, then we have a cheater
-            for k in by_len:
-                if len(by_len[k]) > 1:
-                    for name in by_len[k]:
-
-                        if name not in cheaters:
-                            cheaters[name] = []
-                        cheaters[name].append((key, len(by_len[k]), by_len[k]))
-
-        print("cheaters in mask correction with the image", cheaters)
-
 
         return indexes_to_use
 

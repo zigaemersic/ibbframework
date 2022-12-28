@@ -201,6 +201,27 @@ def copy_pasted_candidates_to_csv(copy_pasted_candidates):
 
 
 
+def check_mask_connected(mask_white_indexes):
+    """
+    Functions checks if there is exactly one ear mask
+    checks that from each point in the mask, you can get to any other point of the mask
+    """
+    coords = set(zip(mask_white_indexes[0], mask_white_indexes[1]))
+
+    visited = set()
+    to_visit = [list(coords)[0]]
+
+    while len(to_visit):
+        x, y = to_visit.pop()
+        if (x, y) in visited:
+            continue  # already visited
+        visited.add((x, y))
+
+        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            if (x + dx, y + dy) in coords:
+                to_visit.append((x + dx, y + dy))
+
+    return len(visited) == len(coords)
 
 
 
